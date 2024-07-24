@@ -39,4 +39,7 @@ Supervisor: Tayyaba Arshad
 3. Ensure the Gemini API is also funcitoning, else create a new API key from AI studio and replace.
 4. Run the Flutter app, made for Android. (Directory: healvision)
 
-PS: The model trained size is above limit, therefore it is could not be uploaded
+PS: The model trained size is above limit, therefore it is could not be uploaded, refer to notebook below to train model.
+
+## Dataset: https://www.kaggle.com/datasets/farwarizvi/emotions-6000/data
+## Notebook: https://www.kaggle.com/code/farwarizvi/bert-ann-on-emotions-6000-v2
