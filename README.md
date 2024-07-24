@@ -34,7 +34,7 @@ Supervisor: Tayyaba Arshad
 ### View the Presentation with Demo on: https://www.canva.com/design/DAGKQlTnP-Q/SeCBZNRKGDp4FxnxJlHmyw/edit?utm_content=DAGKQlTnP-Q&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton 
 
 ## Guide to View:
-1. Deploy the model by running the myapi.py file in CLI Virtual Environment, ensure the Authentication token is set according to your token on Ngrok
+1. Deploy the model by running the myapi.py file in CLI Virtual Environment, ensure the Authentication token is set according to your token on Ngrok (Directory: healvision API)
 2. Once the API is running, you will get a Ngrok Public URL. Copy this URL to 'baseURL' variable (in chat_bot_controller.dart)
 3. Ensure the Gemini API is also funcitoning, else create a new API key from AI studio and replace.
-4. Run the Flutter app, made for Android.
+4. Run the Flutter app, made for Android. (Directory: healvision)
