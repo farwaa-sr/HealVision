@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "317341733728",
+    "project_id": "healvisionapp",
+    "storage_bucket": "healvisionapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317341733728:android:e4b884c92c947668648405",
+        "android_client_info": {
+          "package_name": "com.ictislamabad.healvision"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRWwQZZ1OIhe3AazCeEBoCcOyJhkrfx-I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
