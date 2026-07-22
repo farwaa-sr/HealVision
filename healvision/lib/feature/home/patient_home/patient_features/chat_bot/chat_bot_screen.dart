@@ -102,12 +102,12 @@ class ChatBotScreen extends StatelessWidget {
   }
 
   Widget _defaultMessageRow(ChatMessage message, ChatBotController controller) {
-    final isGemini = message.user.id == controller.geminiUser.id;
+    final isBot = message.user.id == controller.healUser.id;
     final alignment =
-        isGemini ? CrossAxisAlignment.start : CrossAxisAlignment.end;
-    final backgroundColor = isGemini ? Colors.grey.shade200 : WColors.primary;
+        isBot ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+    final backgroundColor = isBot ? Colors.grey.shade200 : WColors.primary;
     return Align(
-      alignment: isGemini ? Alignment.centerLeft : Alignment.centerRight,
+      alignment: isBot ? Alignment.centerLeft : Alignment.centerRight,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         padding: const EdgeInsets.all(10),
@@ -119,7 +119,7 @@ class ChatBotScreen extends StatelessWidget {
           crossAxisAlignment: alignment,
           children: [
             Visibility(
-              visible: !controller.hideUserName && isGemini,
+              visible: !controller.hideUserName && isBot,
               child: Text(
                 message.user.firstName!,
                 style: TextStyle(
@@ -132,7 +132,7 @@ class ChatBotScreen extends StatelessWidget {
             ReadMoreText(
               message.text,
               style: TextStyle(
-                color: isGemini ? Colors.black : Colors.white,
+                color: isBot ? Colors.black : Colors.white,
               ),
               trimLines: 4,
               trimMode: TrimMode.Line,
@@ -152,7 +152,7 @@ class ChatBotScreen extends StatelessWidget {
               DateFormat('hh:mm a').format(message.createdAt),
               style: TextStyle(
                 fontSize: 10,
-                color: isGemini ? Colors.black : Colors.white,
+                color: isBot ? Colors.black : Colors.white,
               ),
             ),
           ],

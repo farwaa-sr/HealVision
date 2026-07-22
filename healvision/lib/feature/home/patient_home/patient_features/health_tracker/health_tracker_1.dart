@@ -7,7 +7,6 @@ import 'package:list_wheel_scroll_view_nls/list_wheel_scroll_view_nls.dart';
 
 import '../../../../../utilis/constants/colors.dart';
 import '../controller/health_tracker_controller.dart';
-import '../view_appointment.dart';
 import '../widgets/assesment_widget.dart';
 import 'health_tracker_2.dart';
 

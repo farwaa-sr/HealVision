@@ -4,10 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:healvision/utilis/constants/colors.dart';
 
 import '../../../../../utilis/validations/validation.dart';
-import '../../../therapist_home/navigation_menu.dart';
+import '../../../navigation_menu.dart';
 
 import '../controller/health_tracker_controller.dart';
-import '../view_appointment.dart';
 import '../widgets/assesment_widget.dart';
 
 class SubstanceUseDataScreen extends StatelessWidget {

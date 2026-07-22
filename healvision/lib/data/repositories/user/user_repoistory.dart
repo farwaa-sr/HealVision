@@ -93,6 +93,19 @@ class UserRepository extends GetxController {
     }
   }
 
+// Save an FCM device token so server-side reminders can push to this device
+  Future<void> saveDeviceToken(String userId, String token) async {
+    try {
+      await _db.collection("Users").doc(userId).set({
+        'fcmTokens': FieldValue.arrayUnion([token]),
+      }, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } catch (e) {
+      throw 'Somthing went wrong. Please try again';
+    }
+  }
+
 // Function to remove user data from firbase
   Future<void> removeUserRecord(String userid) async {
     try {
@@ -123,21 +136,6 @@ class UserRepository extends GetxController {
       throw TPlatformException(e.code).message;
     } catch (e) {
       throw 'Somthing went wrong. Please try again';
-    }
-  }
-
-  Future<List<UserModel>> fetchUsersByRole(String role) async {
-    try {
-      final snapshot = await _db.collection('Users').where('Role', isEqualTo: role).get();
-      return snapshot.docs.map((doc) => UserModel.fromSnapshot(doc)).toList();
-    } on FirebaseException catch (e) {
-      throw TFirebaseException(e.code).message;
-    } on FormatException catch (_) {
-      throw const TFormatException();
-    } on PlatformException catch (e) {
-      throw TPlatformException(e.code).message;
-    } catch (e) {
-      throw 'Something went wrong. Please try again';
     }
   }
 }

@@ -103,28 +103,6 @@ class TSignUpForm extends StatelessWidget {
           const SizedBox(
             height: TSizes.spaceBtwInputFields,
           ),
-          // Role Selection Drop down
-          DropdownButtonFormField(
-            validator: (value) => TValidator.vaildationEmptyText('Role', value),
-            decoration: const InputDecoration(prefixIcon: Icon(Icons.person)),
-            onChanged: (value) {
-              controller.selectedRole.value = value.toString();
-            },
-            items: [
-              'Therapist',
-              'Patient'
-            ]
-                .map(
-                  (option) => DropdownMenuItem(
-                    value: option,
-                    child: Text(option),
-                  ),
-                )
-                .toList(),
-          ),
-          const SizedBox(
-            height: TSizes.spaceBtwInputFields,
-          ),
           // Password
           Obx(
             () => TextFormField(

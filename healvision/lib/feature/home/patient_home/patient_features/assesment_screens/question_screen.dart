@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../utilis/constants/colors.dart';
 import '../../../../../utilis/constants/size.dart';
 import '../controller/assesment_controller.dart';
-import '../view_appointment.dart';
 import '../widgets/assesment_widget.dart';
 
 class QuestionScreen extends StatelessWidget {

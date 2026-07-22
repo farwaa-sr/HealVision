@@ -16,6 +16,12 @@ class AssessmentRepository extends GetxController {
   Future<void> saveAssessmentResults(String userId, AssessmentResult assModel, int totalScore) async {
     try {
       await _db.collection("Assessments").doc(userId).set(assModel.toJson(), SetOptions(merge: true));
+      // Also append a history entry so we can chart the score trend over time.
+      await _db
+          .collection("Assessments")
+          .doc(userId)
+          .collection("history")
+          .add({'totalScore': totalScore, 'timestamp': assModel.timestamp});
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
     } on FormatException catch (_) {
@@ -48,6 +54,29 @@ class AssessmentRepository extends GetxController {
       return HealthAssessmentDataModel.fromSnapshot(snapshot);
     } catch (e) {
       throw Exception('Failed to fetch health assessment data: $e');
+    }
+  }
+
+  /// Returns assessment score history oldest-first as {score, date} maps.
+  Future<List<Map<String, dynamic>>> fetchScoreHistory(String userId,
+      {int limit = 10}) async {
+    try {
+      final snap = await _db
+          .collection("Assessments")
+          .doc(userId)
+          .collection("history")
+          .orderBy('timestamp', descending: true)
+          .limit(limit)
+          .get();
+      final list = snap.docs
+          .map((d) => {
+                'score': (d.data()['totalScore'] ?? 0) as int,
+                'date': (d.data()['timestamp'] as Timestamp?)?.toDate(),
+              })
+          .toList();
+      return list.reversed.toList();
+    } catch (e) {
+      return [];
     }
   }
 

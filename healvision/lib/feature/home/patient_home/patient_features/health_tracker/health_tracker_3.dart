@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:healvision/feature/home/patient_home/patient_features/view_appointment.dart';
 import 'package:healvision/utilis/constants/colors.dart';
 import 'package:healvision/utilis/constants/size.dart';
 

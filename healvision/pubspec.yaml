@@ -33,15 +33,15 @@ dependencies:
   url_launcher: ^6.2.6
   list_wheel_scroll_view_nls: ^0.0.3
   table_calendar: ^3.1.2
-  flutter_gemini: ^2.0.3
   dash_chat_2: ^0.0.20
-  http: ^1.2.1
 
   # ----- FireBase -------------
   firebase_core: ^2.29.0
   firebase_storage: ^11.7.1
   firebase_auth: ^4.19.1
   cloud_firestore: ^4.16.1
+  cloud_functions: ^4.7.6
+  firebase_messaging: ^14.9.4
   google_sign_in: ^6.2.1
 
 dev_dependencies:

@@ -1,25 +1,22 @@
-import 'dart:convert';
-
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../../../data/repositories/chatbot/chat_bot_repoistory.dart';
 import '../../../../personalization/controllers/user_controller.dart';
 import '../../../model/chat_bot_model.dart';
 
-
+/// Recovery chatbot backed by Claude via the `claudeChat` Firebase Cloud
+/// Function. The Anthropic API key stays server-side — never in the app.
 class ChatBotController extends GetxController {
   static ChatBotController get to => Get.find();
 
   final userController = Get.put(UserController());
   final chatrepository = Get.put(ChatBotRepository());
-  final Gemini gemini = Gemini.instance;
+  final FirebaseFunctions _functions =
+      FirebaseFunctions.instanceFor(region: 'us-central1');
+
   RxBool isLoading = false.obs;
-  //RxBool isLoadingpredication = false.obs;
-  final String baseUrl = 'https://3d66-111-68-97-146.ngrok-free.app';
 
   late String userId;
   late String userName;
@@ -30,41 +27,31 @@ class ChatBotController extends GetxController {
   set hideUserName(bool value) => _hideUserName.value = value;
 
   late ChatUser currentUser;
-  ChatUser geminiUser = ChatUser(
+  ChatUser healUser = ChatUser(
     id: "1",
-    firstName: "healvision",
-    profileImage:
-        "https://seeklogo.com/images/G/google-gemini-logo-A5787B2669-seeklogo.com.png",
+    firstName: "HealVision",
   );
 
   RxList<ChatMessage> messages = RxList<ChatMessage>();
-  //RxList<PredictionMessage> predictionMessages = RxList<PredictionMessage>();
 
   @override
   void onInit() {
-    // Initialize userId and userName from UserController
     userId = userController.user.value.id;
     userName = userController.user.value.fullname;
-
-    // Initialize currentUser after getting userId and userName
     currentUser = ChatUser(id: userId, firstName: userName);
-
-    // Fetch previous chat messages
     fetchMessages(userId);
-
     super.onInit();
   }
-
 
   void fetchMessages(String userId) {
     isLoading.value = true;
     chatrepository.fetchUserChatMessages(userId).listen((fetchedMessages) {
       messages.assignAll(fetchedMessages
           .map((msg) => ChatMessage(
-                user: msg.senderId == userId ? currentUser : geminiUser,
+                user: msg.senderId == userId ? currentUser : healUser,
                 createdAt: msg.createdAt,
                 text: msg.text,
-                customProperties: {'id': msg.id,'prediction': msg.predication,},
+                customProperties: {'id': msg.id},
               ))
           .toList());
       isLoading.value = false;
@@ -72,98 +59,90 @@ class ChatBotController extends GetxController {
     });
   }
 
-  // Function to send a message
+  // Send a message: persist it, ask Claude, persist and show the reply.
   void sendMessage(ChatMessage chatMessage) async {
     messages.insert(0, chatMessage);
     update();
 
-    // Predict emotion and await the response
-    String emotion = await predictMessage(chatMessage.text);
-
-    // Save the user message to Firestore
+    // Save the user message to Firestore.
     final ChatBotMessage userMessage = ChatBotMessage(
       id: chatMessage.customProperties?['id'] ?? UniqueKey().toString(),
       senderId: chatMessage.user.id,
       text: chatMessage.text,
-      predication: emotion,
+      predication: '',
       createdAt: chatMessage.createdAt,
     );
-
     await chatrepository.saveChatMessage(userId, userMessage);
 
+    // Placeholder while we wait for Claude.
+    ChatMessage loadingMessage = ChatMessage(
+      user: healUser,
+      createdAt: DateTime.now(),
+      text: '...',
+      customProperties: {'id': UniqueKey().toString()},
+    );
+    messages.insert(0, loadingMessage);
+    update();
+
     try {
-      // Add a placeholder message with a loading indicator
-      ChatMessage loadingMessage = ChatMessage(
-        user: geminiUser,
+      final reply = await _askClaude(chatMessage.text);
+
+      messages.removeAt(0); // remove the placeholder
+
+      final ChatMessage newMessage = ChatMessage(
+        user: healUser,
         createdAt: DateTime.now(),
-        text: '...', // Placeholder text for loading
+        text: reply,
         customProperties: {'id': UniqueKey().toString()},
       );
-      messages.insert(0, loadingMessage);
+      messages.insert(0, newMessage);
       update();
 
-      String question = chatMessage.text;
-
-      gemini.text(question).then((value) async {
-        String response = value!.content?.parts?.fold(
-                "", (previous, current) => "$previous ${current.text}") ??
-            "";
-
-        response = _removeMarkdown(response);
-
-        // Remove the loading message
-        messages.removeAt(0);
-
-        ChatMessage newMessage = ChatMessage(
-          user: geminiUser,
-          createdAt: DateTime.now(),
-          text: response,
-          customProperties: {'id': UniqueKey().toString()},
-        );
-        messages.insert(0, newMessage);
-        update();
-
-        // Save the new Gemini message to Firestore
-        final ChatBotMessage newFirestoreMessage = ChatBotMessage(
-          id: newMessage.customProperties?['id'] ?? UniqueKey().toString(),
-          senderId: newMessage.user.id,
-          text: newMessage.text,
-          predication: '',
-          createdAt: newMessage.createdAt,
-        );
-        await chatrepository.saveChatMessage(userId, newFirestoreMessage);
-      });
-    } catch (e) {
-      //print('Error sending message: $e');
-    }
-  }
-
-  // Function to remove markdown formatting (**text**)
-  String _removeMarkdown(String text) {
-    return text.replaceAll(RegExp(r'\*\*'), ''); // Remove ** from the text
-  }
-
-  Future<String> predictMessage(String message) async {
-    final url = Uri.parse('$baseUrl/predict-emotion');
-    try {
-      final response = await http.post(
-        url,
-        body: jsonEncode({'text': message}),
-        headers: {'Content-Type': 'application/json'},
+      final ChatBotMessage botMessage = ChatBotMessage(
+        id: newMessage.customProperties?['id'] ?? UniqueKey().toString(),
+        senderId: newMessage.user.id,
+        text: newMessage.text,
+        predication: '',
+        createdAt: newMessage.createdAt,
       );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data['emotion'];
-      } else {
-        //print('Failed with status code: ${response.statusCode}');
-        //print('Failed with body: ${response.body}');
-        throw Exception(
-            'Failed to get prediction from API: Status code ${response.statusCode}');
-      }
+      await chatrepository.saveChatMessage(userId, botMessage);
     } catch (e) {
-      //print('Exception caught: $e');
-      throw Exception('Failed to connect to API: $e');
+      messages.removeAt(0); // remove the placeholder
+      messages.insert(
+        0,
+        ChatMessage(
+          user: healUser,
+          createdAt: DateTime.now(),
+          text: "I'm having trouble responding right now. Please try again.",
+          customProperties: {'id': UniqueKey().toString()},
+        ),
+      );
+      update();
     }
+  }
+
+  // Calls the `claudeChat` callable, sending recent history for context.
+  Future<String> _askClaude(String message) async {
+    // Build history (oldest first), excluding the just-inserted user message
+    // and any placeholder, capped to the last ~12 turns for context.
+    final history = messages
+        .where((m) => m.text != '...' && m.text != message)
+        .toList()
+        .reversed
+        .map((m) => {
+              'role': m.user.id == userId ? 'user' : 'assistant',
+              'text': m.text,
+            })
+        .toList();
+    final recent =
+        history.length > 12 ? history.sublist(history.length - 12) : history;
+
+    final callable = _functions.httpsCallable('claudeChat');
+    final result = await callable.call<Map<String, dynamic>>({
+      'message': message,
+      'history': recent,
+    });
+    final reply = (result.data['reply'] as String?)?.trim() ?? '';
+    return reply.isEmpty ? "I'm here with you. Tell me more." : reply;
   }
 }
- 

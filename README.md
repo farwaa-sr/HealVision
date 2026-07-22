@@ -33,13 +33,31 @@ Supervisor: Tayyaba Arshad
 
 ### View the Presentation with Demo on: https://www.canva.com/design/DAGKQlTnP-Q/SeCBZNRKGDp4FxnxJlHmyw/edit?utm_content=DAGKQlTnP-Q&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton 
 
-## Guide to View:
-1. Deploy the model by running the myapi.py file in CLI Virtual Environment, ensure the Authentication token is set according to your token on Ngrok (Directory: healvision API) 
-2. Once the API is running, you will get a Ngrok Public URL. Copy this URL to 'baseURL' variable (in chat_bot_controller.dart)
-3. Ensure the Gemini API is also funcitoning, else create a new API key from AI studio and replace.
-4. Run the Flutter app, made for Android. (Directory: healvision)
+## Personal Recovery Companion (updated build)
 
-PS: The model trained size is above limit, therefore it is could not be uploaded, refer to notebook below to train model.
+HealVision has been refocused into a **single-user recovery companion** — no therapist
+role, no appointment booking. The dashboard tracks a sobriety streak, mood/craving
+check-ins, an assessment-score trend, and daily AI encouragement. The chatbot now runs
+on the **Anthropic Claude API** via a Firebase Cloud Function (the API key stays
+server-side), and inbound webhooks trigger check-in push notifications (FCM).
+
+### Setup / Guide to View
+1. **Cloud Functions** (Directory: `healvision/functions`) — requires the Firebase Blaze plan.
+   - `cd healvision/functions && npm install`
+   - Set the server secrets (never committed):
+     - `firebase functions:secrets:set ANTHROPIC_API_KEY`  (your Anthropic API key)
+     - `firebase functions:secrets:set WEBHOOK_SECRET`      (any random string)
+   - Deploy: `firebase deploy --only functions`
+   - Functions: `claudeChat` + `dailyMotivation` (callable) and `sendCheckinReminder` (HTTP webhook).
+2. **Check-in reminders (optional)** — point an external scheduler (cron-job.org, Zapier,
+   GitHub Actions, …) at the deployed `sendCheckinReminder` URL with a POST body
+   `{ "secret": "<WEBHOOK_SECRET>", "title": "...", "body": "..." }`. It fans out an FCM
+   push to registered devices.
+3. **Flutter app** (Directory: `healvision`, Android) — `flutter pub get` then `flutter run`.
+   The app calls the callable functions directly; no ngrok URL or client-side API key needed.
+
+PS: The legacy BERT emotion-detection API (`healvision API/myapi.py`) is no longer used by
+the app. The model training notebook is linked below for reference.
 
 ## Dataset: https://www.kaggle.com/datasets/farwarizvi/emotions-6000/data
 ## Notebook: https://www.kaggle.com/code/farwarizvi/bert-ann-on-emotions-6000-v2

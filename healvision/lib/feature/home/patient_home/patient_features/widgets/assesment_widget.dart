@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../../utilis/constants/colors.dart';
 import '../../../../../utilis/constants/size.dart';
-import '../view_appointment.dart';
 
 class CustomNextButton extends StatelessWidget {
   const CustomNextButton({

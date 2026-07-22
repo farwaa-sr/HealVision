@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:healvision/feature/home/patient_home/patient_features/widgets/assesment_widget.dart';
 
 import '../../../../../utilis/constants/colors.dart';
-import '../view_appointment.dart';
 import 'health_tracker_1.dart';
 
 class HealthTrackerIntroScreen extends StatelessWidget {

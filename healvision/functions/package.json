@@ -1,0 +1,14 @@
+{
+  "name": "healvision-functions",
+  "description": "Cloud Functions for HealVision recovery companion (Claude chat, daily motivation, check-in webhook + FCM push)",
+  "main": "index.js",
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^6.4.0"
+  },
+  "private": true
+}

@@ -8,12 +8,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../../../feature/authentication/screens/onboarding/onboarding_screen.dart';
 import '../../../feature/authentication/screens/sign_in/sign_in.dart';
 import '../../../feature/authentication/screens/sign_up/verify_email.dart';
-import '../../../feature/home/therapist_home/navigation_menu.dart';
+import '../../../feature/home/navigation_menu.dart';
 
 import '../../../utilis/exceptions/firebase_auth_exceptions.dart';
 import '../../../utilis/exceptions/firebase_exceptions.dart';
 import '../../../utilis/exceptions/format_exceptions.dart';
 import '../../../utilis/exceptions/platform_exceptions.dart';
+import '../../../utilis/services/notification_service.dart';
 
 import '../user/user_repoistory.dart';
 
@@ -40,18 +41,9 @@ class AuthenticationRepository extends GetxController {
     final user = _auth.currentUser;
     if (user != null) {
       if (user.emailVerified) {
-        // Retrieve user data from Firebase
-        final userData = await userRepository.fetchUserDetails();
-
-        // Get the user's role
-        final String userRole = userData.role;
-
-        // Redirect based on the user's role
-        if (userRole == 'Therapist') {
-          Get.offAll(() => const NavigationMenuTherapist());
-        } else if (userRole == 'Patient') {
-          Get.offAll(() => const NavigationMenuPatient());
-        }
+        // Register this device for check-in reminders, then land on home.
+        NotificationService.instance.registerFor(user.uid);
+        Get.offAll(() => const NavigationMenuPatient());
       } else {
         Get.offAll(
           () => VerifyEmailScreen(

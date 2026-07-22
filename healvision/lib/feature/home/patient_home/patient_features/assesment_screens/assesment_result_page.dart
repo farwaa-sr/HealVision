@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:healvision/feature/home/patient_home/patient_features/view_appointment.dart';
 import 'package:healvision/utilis/constants/colors.dart';
 
-import '../../../therapist_home/navigation_menu.dart';
+import '../../../navigation_menu.dart';
 import '../controller/assesment_controller.dart';
 
 class AssessmentResultScrenn extends StatelessWidget {

@@ -23,7 +23,6 @@ class SignupController extends GetxController {
   final password = TextEditingController();
   final firstname = TextEditingController();
   final phonenumber = TextEditingController();
-  RxString selectedRole = ''.obs;
 
   GlobalKey<FormState> signupFormKey = GlobalKey<FormState>();
 
@@ -74,7 +73,6 @@ class SignupController extends GetxController {
         lastname: lastname.text.trim(),
         username: username.text.trim(),
         email: email.text.trim(),
-        role: selectedRole.value,
         phoneNumber: phonenumber.text.trim(),
         profilePicture: '',
       );

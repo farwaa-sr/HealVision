@@ -11,7 +11,6 @@ class UserModel {
   final String email;
   String phoneNumber;
   String profilePicture;
-  String role;
 
   // Constructor for UserModel
   UserModel({
@@ -22,7 +21,6 @@ class UserModel {
     required this.email,
     required this.phoneNumber,
     required this.profilePicture,
-    required this.role,
   });
 
   // Helper Function to get the Fullname
@@ -55,7 +53,6 @@ class UserModel {
         email: '',
         phoneNumber: '',
         profilePicture: '',
-        role: '',
       );
 
   // Convert model to json Structure for staring data in Firebase
@@ -67,7 +64,6 @@ class UserModel {
       'Email': email,
       'PhoneNumber': phoneNumber,
       'ProfilePicture': profilePicture,
-      'Role': role,
     };
   }
 
@@ -83,7 +79,6 @@ class UserModel {
         email: data['Email'] ?? '',
         phoneNumber: data['PhoneNumber'] ?? '',
         profilePicture: data['ProfilePicture'] ?? '',
-        role: data['Role'] ?? '',
       );
     } else {
       return UserModel.empty();
